@@ -140,22 +140,13 @@ public class ClientInterface {
     }
 
     private void withdraw() {
-
-        /*
-         * В даному методі ви повинні передбачити перевірки для
-         * коректності полів та зробити зняття коштів
-         */
-
         System.out.println("\n****************");
         System.out.println("Making a withdrawal: ");
         System.out.println("****************");
-
-        System.out.print(">>> Enter user id: ");
-        var userId = scanner.next();
-        System.out.print(">>> Enter user password: ");
-        var password = scanner.next();
+        BankAccount account = authenticate();
         System.out.print(">>> Enter amount: ");
-        var amount = scanner.next();
+        account.withdraw(parseAmount(scanner.next()));
+        System.out.println("Withdrawal successful. New balance: " + account.getAccountBalance());
     }
 
     private void printInfo() {
