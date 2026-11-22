@@ -1,14 +1,18 @@
 import exceptions.AccountException;
+import exceptions.AccountNotFoundException;
 import exceptions.DuplicateUserIdException;
 import exceptions.InvalidCustomerNameException;
 import exceptions.InvalidUserIdException;
+import exceptions.NonZeroBalanceException;
 import exceptions.PasswordMismatchException;
+import exceptions.WrongPasswordException;
 import model.BankAccount;
 import model.CheckingAccount;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class ClientInterface {
@@ -68,7 +72,7 @@ public class ClientInterface {
         if (name.isEmpty()) throw new InvalidCustomerNameException("Customer name cannot be empty");
         System.out.print(">>> Enter user id: ");
         Long userId = parseUserId(scanner.next());
-        if (accounts.stream().anyMatch(a -> a.getUserId().equals(userId))) throw new DuplicateUserIdException("Account with user id " + userId + " already exists");
+        if (findAccount(userId).isPresent()) throw new DuplicateUserIdException("Account with user id " + userId + " already exists");
         System.out.print(">>> Enter user password: ");
         String password = scanner.next();
         BankAccount.validatePassword(password);
@@ -90,21 +94,28 @@ public class ClientInterface {
         }
     }
 
+    private Optional<BankAccount> findAccount(Long userId) {
+        return accounts.stream().filter(a -> a.getUserId().equals(userId)).findFirst();
+    }
+
+    private BankAccount authenticate() {
+        System.out.print(">>> Enter user id: ");
+        Long userId = parseUserId(scanner.next());
+        System.out.print(">>> Enter user password: ");
+        String password = scanner.next();
+        BankAccount account = findAccount(userId).orElseThrow(() -> new AccountNotFoundException("Account with user id " + userId + " not found"));
+        if (!account.checkPassword(password)) throw new WrongPasswordException("Wrong password for user id " + userId);
+        return account;
+    }
+
     private void deleteAccount() {
-
-        /*
-         * В даному методі ви повинні передбачити перевірки для
-         * коректності полів для видалення акаунту та видалити акаунт
-         */
-
         System.out.println("\n****************");
         System.out.println("Deleting account: ");
         System.out.println("****************");
-
-        System.out.print(">>> Enter user id: ");
-        var userId = scanner.next();
-        System.out.print(">>> Enter user password: ");
-        var password = scanner.next();
+        BankAccount account = authenticate();
+        if (account.getAccountBalance() != 0) throw new NonZeroBalanceException("Cannot delete account with non-zero balance: " + account.getAccountBalance());
+        accounts.remove(account);
+        System.out.println("Account with user id " + account.getUserId() + " deleted successfully");
     }
 
     private void deposit() {
