@@ -150,38 +150,20 @@ public class ClientInterface {
     }
 
     private void printInfo() {
-
-        /*
-         * Даний метод виводить інформацію щодо рахунку. Ви
-         * повинні перевірити наявність рахунку та вивести інформацію
-         * стосовно нього
-         */
-
         System.out.println("\n****************");
         System.out.println("Printing account info: ");
         System.out.println("****************");
-
-        System.out.print(">>> Enter user id: ");
-        var userId = scanner.next();
-        System.out.print(">>> Enter user password: ");
-        var password = scanner.next();
-
+        BankAccount account = authenticate();
         System.out.println("\nAccount info: ");
-
-        System.out.println(" - customer name: ");
-        System.out.println(" - account balance: ");
-        System.out.println(" - account type: Checking");
-        System.out.println(" - account daily withdrawal limit: ");
-
-        System.out.print("\nPress Enter to return to main menu...");
-
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        System.out.println(" - customer name: " + account.getCustomerName());
+        System.out.println(" - account number: " + account.getAccountNumber());
+        System.out.println(" - account balance: " + account.getAccountBalance());
+        if (account instanceof CheckingAccount checking) {
+            System.out.println(" - account type: Checking");
+            System.out.println(" - account daily withdrawal limit: " + checking.getDailyWithdrawalLimit());
         }
+        System.out.print("\nPress Enter to return to main menu...");
+        scanner.nextLine();
+        if (scanner.hasNextLine()) scanner.nextLine();
     }
-
-
-
 }
