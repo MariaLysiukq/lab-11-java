@@ -1,6 +1,7 @@
 import exceptions.AccountException;
 import exceptions.AccountNotFoundException;
 import exceptions.DuplicateUserIdException;
+import exceptions.InvalidAmountException;
 import exceptions.InvalidCustomerNameException;
 import exceptions.InvalidUserIdException;
 import exceptions.NonZeroBalanceException;
@@ -118,23 +119,24 @@ public class ClientInterface {
         System.out.println("Account with user id " + account.getUserId() + " deleted successfully");
     }
 
+    private double parseAmount(String input) {
+        try {
+            double amount = Double.parseDouble(input);
+            if (!Double.isFinite(amount)) throw new InvalidAmountException("Amount must be a finite number: " + input);
+            return amount;
+        } catch (NumberFormatException e) {
+            throw new InvalidAmountException("Amount must be a number: " + input);
+        }
+    }
+
     private void deposit() {
-
-        /*
-         * В даному методі ви повинні передбачити перевірки для
-         * коректності полів та зробити внесок
-         */
-
         System.out.println("\n****************");
         System.out.println("Making a deposit: ");
         System.out.println("****************");
-
-        System.out.print(">>> Enter user id: ");
-        var userId = scanner.next();
-        System.out.print(">>> Enter user password: ");
-        var password = scanner.next();
+        BankAccount account = authenticate();
         System.out.print(">>> Enter amount: ");
-        var amount = scanner.next();
+        account.deposit(parseAmount(scanner.next()));
+        System.out.println("Deposit successful. New balance: " + account.getAccountBalance());
     }
 
     private void withdraw() {
