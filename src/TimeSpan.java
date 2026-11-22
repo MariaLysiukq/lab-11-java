@@ -1,4 +1,5 @@
 import exceptions.IllegalInputTimeSpanException;
+import exceptions.IllegalScaleFactorException;
 import exceptions.NegativeTimeSpanException;
 
 public class TimeSpan {
@@ -74,7 +75,7 @@ public class TimeSpan {
     }
 
     public void scale(int factor) {
-        if (factor <= 0) throw new IllegalArgumentException("Множник має бути > 0");
+        if (factor <= 0) throw new IllegalScaleFactorException("Scale factor must be greater than 0: " + factor);
         int totalMinutes = this.getTotalMinutes() * factor;
         this.hours = totalMinutes / 60;
         this.minutes = totalMinutes % 60;

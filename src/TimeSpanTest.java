@@ -27,6 +27,12 @@ public class TimeSpanTest {
         System.out.println("after failed calls span is still -> " + span);
         check("subtract(270)", () -> span.subtract(270));
         System.out.println("subtract(270) -> " + span);
+        TimeSpan scaled = new TimeSpan(0, 40);
+        check("scale(0)", () -> scaled.scale(0));
+        check("scale(-2)", () -> scaled.scale(-2));
+        System.out.println("after failed scale calls -> " + scaled);
+        scaled.scale(2);
+        System.out.println("scale(2) -> " + scaled);
     }
 
     private static void check(String label, Runnable action) {
