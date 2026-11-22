@@ -1,6 +1,10 @@
-
-
+import exceptions.AccountException;
+import exceptions.DuplicateUserIdException;
+import exceptions.InvalidCustomerNameException;
+import exceptions.InvalidUserIdException;
+import exceptions.PasswordMismatchException;
 import model.BankAccount;
+import model.CheckingAccount;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +17,8 @@ public class ClientInterface {
 
     private final Scanner scanner = new Scanner(System.in);
 
+    private long nextAccountNumber = 1;
+
     private List<String> options = List.of(
             "1 - Create account",
             "2 - Delete account",
@@ -23,40 +29,25 @@ public class ClientInterface {
     );
 
     public void start() throws IOException {
-
-        String option;
         while (true) {
             printMainMenu();
-            option = scanner.next();
-
-            switch (Integer.parseInt(option)) {
-                case 1:
-                    try {
-                        addNewAccount();
-                    } catch (Exception e) {
-                        System.err.println("Error: " + e.getMessage() + "\n");
-                        break;
+            String option = scanner.next();
+            try {
+                switch (option) {
+                    case "1" -> addNewAccount();
+                    case "2" -> deleteAccount();
+                    case "3" -> deposit();
+                    case "4" -> withdraw();
+                    case "5" -> printInfo();
+                    case "6" -> {
+                        return;
                     }
-                    break;
-                case 2:
-                    deleteAccount();
-                    break;
-                case 3:
-                    deposit();
-                    break;
-                case 4:
-                    withdraw();
-                    break;
-                case 5:
-                    printInfo();
-                    break;
-                case 6:
-                    return;
-                default:
-                    // Please enter a valid choice (1 thru 6)
+                    default -> System.err.println("Please enter a valid choice (1 thru 6)");
+                }
+            } catch (AccountException e) {
+                System.err.println("Error: " + e.getMessage());
             }
         }
-
     }
 
     private void printMainMenu() throws IOException {
@@ -68,25 +59,35 @@ public class ClientInterface {
     }
 
     private void addNewAccount() {
-
-        /*
-         * В даному методі ви повинні передбачити перевірки для
-         * коректності полів нового акаунту та створити новий акаунт, якщо всі дані
-         * є коректними
-         */
-
         System.out.println("\n****************");
         System.out.println("Creating new account: ");
         System.out.println("****************");
-
         System.out.print(">>> Enter customer name: ");
-        var name = scanner.next();
+        scanner.nextLine();
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) throw new InvalidCustomerNameException("Customer name cannot be empty");
         System.out.print(">>> Enter user id: ");
-        var userId = scanner.next();
+        Long userId = parseUserId(scanner.next());
+        if (accounts.stream().anyMatch(a -> a.getUserId().equals(userId))) throw new DuplicateUserIdException("Account with user id " + userId + " already exists");
         System.out.print(">>> Enter user password: ");
         String password = scanner.next();
+        BankAccount.validatePassword(password);
         System.out.print(">>> Confirm password: ");
         String confirmPassword = scanner.next();
+        if (!password.equals(confirmPassword)) throw new PasswordMismatchException("Password and confirmation do not match");
+        BankAccount account = new CheckingAccount(name, nextAccountNumber++, userId, password);
+        accounts.add(account);
+        System.out.println("Account created successfully. Account number: " + account.getAccountNumber());
+    }
+
+    private Long parseUserId(String input) {
+        try {
+            long userId = Long.parseLong(input);
+            if (userId <= 0) throw new InvalidUserIdException("User id must be a positive number: " + input);
+            return userId;
+        } catch (NumberFormatException e) {
+            throw new InvalidUserIdException("User id must be a number: " + input);
+        }
     }
 
     private void deleteAccount() {
