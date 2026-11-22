@@ -1,4 +1,5 @@
 import exceptions.IllegalInputTimeSpanException;
+import exceptions.NegativeTimeSpanException;
 
 public class TimeSpan {
     private int hours;
@@ -49,23 +50,15 @@ public class TimeSpan {
 
     public void subtract(int hours, int minutes) {
         if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalInputTimeSpanException("Invalid time: " + hours + "h " + minutes + "m");
-        int currentTotal = this.getTotalMinutes();
-        int subTotal = hours * 60 + minutes;
-        if (subTotal <= currentTotal) {
-            int newTotal = currentTotal - subTotal;
-            this.hours = newTotal / 60;
-            this.minutes = newTotal % 60;
-        }
+        subtract(hours * 60 + minutes);
     }
 
     public void subtract(int minutes) {
         if (minutes < 0) throw new IllegalInputTimeSpanException("Minutes cannot be negative: " + minutes);
-        int currentTotal = this.getTotalMinutes();
-        if (minutes <= currentTotal) {
-            int newTotal = currentTotal - minutes;
-            this.hours = newTotal / 60;
-            this.minutes = newTotal % 60;
-        }
+        int newTotal = this.getTotalMinutes() - minutes;
+        if (newTotal < 0) throw new NegativeTimeSpanException("TimeSpan " + this + " minus " + minutes + "m would be negative");
+        this.hours = newTotal / 60;
+        this.minutes = newTotal % 60;
     }
 
     public void subtract(TimeSpan span) {

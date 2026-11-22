@@ -21,7 +21,12 @@ public class TimeSpanTest {
         check("add(-10)", () -> span.add(-10));
         check("subtract(0, 75)", () -> span.subtract(0, 75));
         check("subtract(-1)", () -> span.subtract(-1));
+        check("subtract(5, 0)", () -> span.subtract(5, 0));
+        check("subtract(271)", () -> span.subtract(271));
+        check("subtract(TimeSpan 10h 0m)", () -> span.subtract(new TimeSpan(10, 0)));
         System.out.println("after failed calls span is still -> " + span);
+        check("subtract(270)", () -> span.subtract(270));
+        System.out.println("subtract(270) -> " + span);
     }
 
     private static void check(String label, Runnable action) {
