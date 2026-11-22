@@ -1,3 +1,5 @@
+import exceptions.IllegalInputTimeSpanException;
+
 public class TimeSpan {
     private int hours;
     private int minutes;
@@ -8,13 +10,13 @@ public class TimeSpan {
     }
 
     public TimeSpan(int minutes) {
-        if (minutes < 0) throw new IllegalArgumentException("Хвилини не можуть бути від'ємними");
+        if (minutes < 0) throw new IllegalInputTimeSpanException("Minutes cannot be negative: " + minutes);
         this.hours = minutes / 60;
         this.minutes = minutes % 60;
     }
 
     public TimeSpan(int hours, int minutes) {
-        if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalArgumentException("Некоректний час");
+        if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalInputTimeSpanException("Invalid time: " + hours + "h " + minutes + "m");
         this.hours = hours;
         this.minutes = minutes;
     }
@@ -28,14 +30,14 @@ public class TimeSpan {
     public int getMinutes() { return minutes; }
 
     public void add(int hours, int minutes) {
-        if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalArgumentException("Некоректний час");
+        if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalInputTimeSpanException("Invalid time: " + hours + "h " + minutes + "m");
         int totalMinutes = this.getTotalMinutes() + (hours * 60 + minutes);
         this.hours = totalMinutes / 60;
         this.minutes = totalMinutes % 60;
     }
 
     public void add(int minutes) {
-        if (minutes < 0) throw new IllegalArgumentException("Хвилини не можуть бути від'ємними");
+        if (minutes < 0) throw new IllegalInputTimeSpanException("Minutes cannot be negative: " + minutes);
         int totalMinutes = this.getTotalMinutes() + minutes;
         this.hours = totalMinutes / 60;
         this.minutes = totalMinutes % 60;
@@ -46,7 +48,7 @@ public class TimeSpan {
     }
 
     public void subtract(int hours, int minutes) {
-        if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalArgumentException("Некоректний час");
+        if (hours < 0 || minutes < 0 || minutes > 59) throw new IllegalInputTimeSpanException("Invalid time: " + hours + "h " + minutes + "m");
         int currentTotal = this.getTotalMinutes();
         int subTotal = hours * 60 + minutes;
         if (subTotal <= currentTotal) {
@@ -57,7 +59,7 @@ public class TimeSpan {
     }
 
     public void subtract(int minutes) {
-        if (minutes < 0) throw new IllegalArgumentException("Хвилини не можуть бути від'ємними");
+        if (minutes < 0) throw new IllegalInputTimeSpanException("Minutes cannot be negative: " + minutes);
         int currentTotal = this.getTotalMinutes();
         if (minutes <= currentTotal) {
             int newTotal = currentTotal - minutes;
